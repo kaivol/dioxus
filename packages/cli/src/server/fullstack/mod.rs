@@ -1,6 +1,10 @@
 use dioxus_cli_config::CrateConfig;
 
 use crate::{
+<<<<<<< Updated upstream
+=======
+    assets::AssetConfigDropGuard,
+>>>>>>> Stashed changes
     cfg::{ConfigOptsBuild, ConfigOptsServe},
     Result,
 };

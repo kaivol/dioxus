@@ -483,7 +483,7 @@ async fn handle_server_fns_inner(
             let referrer = req.headers().get(REFERER).cloned();
 
             // actually run the server fn
-            let mut res = service.run(req).await;
+            let mut res = ProvideServerContext::new(service.run(req), server_context.clone()).await;
 
 
             // it it accepts text/html (i.e., is a plain form post) and doesn't already have a

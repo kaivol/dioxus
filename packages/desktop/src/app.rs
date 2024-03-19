@@ -43,8 +43,6 @@ pub(crate) struct App {
 }
 
 /// A bundle of state shared between all the windows, providing a way for us to communicate with running webview.
-///
-/// Todo: everything in this struct is wrapped in Rc<>, but we really only need the one top-level refcell
 pub(crate) struct SharedContext {
     pub(crate) event_handlers: WindowEventHandlers,
     pub(crate) pending_webviews: RefCell<Vec<WebviewInstance>>,
@@ -58,7 +56,7 @@ impl App {
         let event_loop = EventLoopBuilder::<UserWindowEvent>::with_user_event().build();
 
         let app = Self {
-            window_behavior: cfg.last_window_close_behaviour,
+            window_behavior: cfg.last_window_close_behavior,
             is_visible_before_start: true,
             webviews: HashMap::new(),
             control_flow: ControlFlow::Wait,

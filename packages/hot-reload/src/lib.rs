@@ -31,10 +31,31 @@ pub enum HotReloadMsg {
 /// Connect to the hot reloading listener. The callback provided will be called every time a template change is detected
 pub fn connect(mut callback: impl FnMut(HotReloadMsg) + Send + 'static) {
     std::thread::spawn(move || {
-        let path = PathBuf::from("./").join("target").join("dioxusin");
+        // get the cargo manifest directory, where the target dir lives
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+
+        // walk the path until we a find a socket named `dioxusin` inside that folder's target directory
+        loop {
+            let maybe = path.join("target").join("dioxusin");
+
+            if maybe.exists() {
+                path = maybe;
+                break;
+            }
+
+            // It's likely we're running under just cargo and not dx
+            path = match path.parent() {
+                Some(parent) => parent.to_path_buf(),
+                None => return,
+            };
+        }
 
         // There might be a socket since the we're not running under the hot reloading server
-        let Ok(socket) = LocalSocketStream::connect(path) else {
+        let Ok(socket) = LocalSocketStream::connect(path.clone()) else {
+            println!(
+                "could not find hot reloading server at {:?}, make sure it's running",
+                path
+            );
             return;
         };
 
@@ -50,9 +71,6 @@ pub fn connect(mut callback: impl FnMut(HotReloadMsg) + Send + 'static) {
             }
 
             let Ok(template) = serde_json::from_str(Box::leak(buf.into_boxed_str())) else {
-                eprintln!(
-                    "Could not parse hot reloading message - make sure your client is up to date"
-                );
                 continue;
             };
 

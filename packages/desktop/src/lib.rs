@@ -35,6 +35,9 @@ pub use tao::dpi::{LogicalPosition, LogicalSize};
 pub use tao::event::WindowEvent;
 pub use tao::window::WindowBuilder;
 pub use wry;
+// Reexport muda only if we are on desktop platforms that support menus
+#[cfg(not(any(target_os = "ios", target_os = "android")))]
+pub use muda;
 
 // Public exports
 pub use assets::AssetRequest;
